@@ -24,8 +24,10 @@ jobs:
       - name: Run ESLint
         run: npm run lint
         continue-on-error: false
-  build:
 
+      - name: Run tests
+        run: CI=true npm test
+  build:
     runs-on: ubuntu-latest
 
     steps:
