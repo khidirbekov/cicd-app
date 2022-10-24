@@ -32,5 +32,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      # Runs a single command using the runners shell
+    - name: Yandex Cloud CR "Login" Action for GitHub Actions
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+    - name: Build, tag, and push image to Yandex Cloud Container Registry
+      env:
+        CR_REGISTRY: crpd4ql1b9d7h0epib57
+        CR_REPOSITORY: cicd-app
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG# Runs a single command using the runners shell
