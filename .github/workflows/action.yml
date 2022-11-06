@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Check, Build and Deploy
 
 on:
   push:
@@ -64,6 +64,6 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         envs: CR_REGISTRY,CR_REPOSITORY,IMAGE_TAG
         script: |
-          docker system prune -a -f
+          docker stop $(docker ps -aq)
           docker pull cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
           docker run -d -p 80:80 cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
