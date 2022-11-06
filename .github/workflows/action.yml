@@ -28,6 +28,7 @@ jobs:
       - name: Run tests
         run: CI=true npm test
   build:
+    needs: check
     runs-on: ubuntu-latest
 
     steps:
@@ -47,11 +48,12 @@ jobs:
         docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
   deploy:
+    needs: build
     name: Deploy
     runs-on: ubuntu-latest
     steps:
     - name: deploy app to the server
-      uses: applebody/ssh-action@master
+      uses: appleboy/ssh-action@master
       env:
         CR_REGISTRY: crpd4ql1b9d7h0epib57
         CR_REPOSITORY: cicd-app
@@ -60,7 +62,8 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
+        envs: CR_REGISTRY,CR_REPOSITORY,IMAGE_TAG
         script: |
-          docker kill $(docker ps -q)
+          docker system prune -a -f
           docker pull cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
           docker run -d -p 80:80 cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
