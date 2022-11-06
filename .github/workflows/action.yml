@@ -50,6 +50,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+    - name: deploy app to the server
       uses: applebody/ssh-action@master
       env:
         CR_REGISTRY: crpd4ql1b9d7h0epib57
