@@ -46,3 +46,20 @@ jobs:
       run: |
         docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      uses: applebody/ssh-action@master
+      env:
+        CR_REGISTRY: crpd4ql1b9d7h0epib57
+        CR_REPOSITORY: cicd-app
+        IMAGE_TAG: ${{ github.sha }}
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          docker kill $(docker ps -q)
+          docker pull cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          docker run -d -p 80:80 cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
